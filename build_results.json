@@ -8,10 +8,14 @@
   },
   "PYTHON_TEST": {
     "project_type": "python",
-    "timestamp": "2025-09-27T01:16:09.634121",
+    "timestamp": "2025-09-27T01:22:05.639325",
     "result": {
-      "error": "Build error: COPY failed: stat root/.local: file does not exist",
-      "log_file": "logs\\build_PYTHON_TEST_20250927_011609.log"
+      "success": true,
+      "image_id": "sha256:6b91001408a9749527b80e7156838af09a1ac19c0f327a086e335fa8999ec654",
+      "image_name": "amazing-automata/python_test:latest",
+      "size": "43.6 MB",
+      "log_file": "logs\\build_PYTHON_TEST_20250927_012204.log",
+      "test_passed": true
     }
   },
   "gin": {

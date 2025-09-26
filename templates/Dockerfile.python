@@ -1,22 +1,14 @@
-# Build stage
-FROM python:3.11 as builder
-
-WORKDIR /app
-COPY . .
-
-# Always create .local directory and conditionally install
-RUN mkdir -p /root/.local && \
-    if [ -f requirements.txt ]; then pip install --user --no-cache-dir -r requirements.txt; fi
-
-# Final stage
 FROM python:3.11-slim
 
 WORKDIR /app
+
+# Copy project files
 COPY . .
 
-# Copy .local directory (always exists due to mkdir -p)
-COPY --from=builder /root/.local /root/.local
+# Install dependencies if requirements.txt exists
+RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
 
-ENV PATH=/root/.local/bin:$PATH
 EXPOSE 8000
+
+# Run the application
 CMD ["python", "{{ENTRY_POINT}}"]
