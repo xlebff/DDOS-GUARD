@@ -95,4 +95,8 @@ class GitHubScanner:
                 elif indicator in file_names:
                     return project_type
         
+        # Дополнительная проверка для Python проектов по .py файлам
+        if any(f.endswith('.py') for f in file_names):
+            return 'python'
+        
         return 'unknown'

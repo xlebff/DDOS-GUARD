@@ -29,8 +29,8 @@ class DockerBuilder:
         try:
             # Build the Docker image
             image, build_logs = self.client.images.build(
-                path=str(repo_path.parent),  # Directory containing Dockerfile and source code
-                dockerfile=str(dockerfile_path),
+                path=str(repo_path),  # Directory containing Dockerfile and source code
+                dockerfile="Dockerfile",  # Dockerfile name in the build context
                 tag=image_name,
                 rm=True,  # Remove intermediate containers
                 forcerm=True

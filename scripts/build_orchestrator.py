@@ -19,13 +19,23 @@ class BuildOrchestrator:
         print(f"Starting project build: {repo_name}")
         print(f"Project type: {project_type}")
         
-        # Step 1: Generate Dockerfile
-        print("Generating Dockerfile...")
-        dockerfile_path = self.docker_gen.generate_dockerfile(repo_path, project_type)
-        
-        # Move Dockerfile to repository directory for build context
+        # Check if Dockerfile already exists
         target_dockerfile = repo_path / "Dockerfile"
-        dockerfile_path.rename(target_dockerfile)
+        
+        if target_dockerfile.exists():
+            print("Using existing Dockerfile...")
+        else:
+            # Step 1: Generate Dockerfile
+            print("Generating Dockerfile...")
+            dockerfile_path = self.docker_gen.generate_dockerfile(repo_path, project_type)
+            
+            # Copy Dockerfile to repository directory for build context
+            if dockerfile_path.exists():
+                import shutil
+                shutil.copy2(dockerfile_path, target_dockerfile)
+                print(f"Dockerfile copied to: {target_dockerfile}")
+            else:
+                return {'error': f'Failed to generate Dockerfile for {repo_name}'}
         
         # Step 2: Build Docker image
         print("Building Docker image...")
