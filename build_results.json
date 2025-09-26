@@ -8,10 +8,18 @@
   },
   "PYTHON_TEST": {
     "project_type": "python",
-    "timestamp": "2025-09-27T00:17:47.644344",
+    "timestamp": "2025-09-27T01:16:09.634121",
     "result": {
       "error": "Build error: COPY failed: stat root/.local: file does not exist",
-      "log_file": "logs\\build_PYTHON_TEST_20250927_001541.log"
+      "log_file": "logs\\build_PYTHON_TEST_20250927_011609.log"
+    }
+  },
+  "gin": {
+    "project_type": "go",
+    "timestamp": "2025-09-27T01:17:51.839610",
+    "result": {
+      "error": "Build error: The command '/bin/sh -c go mod download' returned a non-zero code: 1",
+      "log_file": "logs\\build_gin_20250927_011703.log"
     }
   }
 }

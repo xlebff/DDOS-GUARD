@@ -1,16 +1,13 @@
 import git # type: ignore
 import shutil
 import stat
+import os
 from pathlib import Path
 
 class RepositoryManager:
     def __init__(self, base_dir="cloned_repos"):
         self.base_dir = Path(base_dir)
         self.base_dir.mkdir(exist_ok=True)
-    
-    def remove_readonly(func, path, _):
-        os.chmod(path, stat.S_IWRITE)
-        func(path)
 
     def clone_repository(self, repo_url: str, folder_name: str = None) -> Path:
         # Clone repository to specified folder
@@ -24,7 +21,8 @@ class RepositoryManager:
         # Remove folder if it already exists
         if clone_path.exists():
             try:
-                shutil.rmtree(clone_path, onerror=self.remove_readonly)
+                os.chmod(clone_path, stat.S_IWRITE)
+                shutil.rmtree(clone_path)
                 print(f"Removed existing folder: {folder_name}")
             except PermissionError:
                 print(f"Warning: Could not remove existing folder {folder_name}, trying to continue...")

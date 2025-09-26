@@ -1,25 +1,22 @@
-# Этап 1: Сборка
+# Build stage
 FROM python:3.11 as builder
 
 WORKDIR /app
 COPY . .
 
-# Устанавливаем зависимости если есть requirements.txt
-RUN if [ -f requirements.txt ]; then pip install --user --no-cache-dir -r requirements.txt; fi
+# Always create .local directory and conditionally install
+RUN mkdir -p /root/.local && \
+    if [ -f requirements.txt ]; then pip install --user --no-cache-dir -r requirements.txt; fi
 
-# Этап 2: Финальный образ
+# Final stage
 FROM python:3.11-slim
 
 WORKDIR /app
-# Копируем установленные зависимости из этапа builder (если есть)
-COPY --from=builder /root/.local /root/.local
-# Копируем исходный код
 COPY . .
 
-# Указываем PATH, чтобы система находила наши зависимости
+# Copy .local directory (always exists due to mkdir -p)
+COPY --from=builder /root/.local /root/.local
+
 ENV PATH=/root/.local/bin:$PATH
-
 EXPOSE 8000
-
-# Команда для запуска приложения
 CMD ["python", "{{ENTRY_POINT}}"]
