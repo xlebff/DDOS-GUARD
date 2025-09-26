@@ -8,12 +8,12 @@ class DockerBuilder:
         self.logs_dir = Path(logs_dir)
         self.logs_dir.mkdir(exist_ok=True)
         
-        # Connecting to Docker
+        # Connect to Docker daemon
         try:
             self.client = docker.from_env()
-            print("docker client connected")
+            print("Docker client connected successfully")
         except Exception as e:
-            print(f"error connecting to docker: {e}")
+            print(f"Error connecting to Docker: {e}")
             self.client = None
     
     def build_image(self, repo_path: Path, dockerfile_path: Path, project_type: str) -> dict:        
@@ -24,22 +24,23 @@ class DockerBuilder:
         image_name = f"amazing-automata/{repo_name.lower()}:latest"
         log_file = self.logs_dir / f"build_{repo_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
         
-        print(f"assembling the image: {image_name}")
+        print(f"Building Docker image: {image_name}")
         
         try:
+            # Build the Docker image
             image, build_logs = self.client.images.build(
-                path=str(repo_path.parent),  # Папка с Dockerfile и исходниками
+                path=str(repo_path.parent),  # Directory containing Dockerfile and source code
                 dockerfile=str(dockerfile_path),
                 tag=image_name,
-                rm=True,  # Удалять промежуточные контейнеры
+                rm=True,  # Remove intermediate containers
                 forcerm=True
             )
             
-            # Сохраняем логи
+            # Save build logs to file
             self._save_build_logs(build_logs, log_file)
             
-            print(f"✅ Образ собран: {image_name}")
-            print(f"📊 Размер образа: {self._get_image_size(image)}")
+            print(f"Image built successfully: {image_name}")
+            print(f"Image size: {self._get_image_size(image)}")
             
             return {
                 'success': True,
@@ -50,24 +51,24 @@ class DockerBuilder:
             }
             
         except docker.errors.BuildError as e:
-            error_msg = f"Ошибка сборки: {e}"
-            print(f"❌ {error_msg}")
+            error_msg = f"Build error: {e}"
+            print(f"Build failed: {error_msg}")
             self._save_error_log(e, log_file)
             return {'error': error_msg, 'log_file': str(log_file)}
         
         except Exception as e:
-            error_msg = f"Неожиданная ошибка: {e}"
-            print(f"❌ {error_msg}")
+            error_msg = f"Unexpected error: {e}"
+            print(f"Build failed: {error_msg}")
             return {'error': error_msg}
     
     def _get_image_size(self, image) -> str:
-        """Возвращает размер образа в читаемом формате"""
+        # Convert image size from bytes to megabytes
         size_bytes = image.attrs['Size']
         size_mb = size_bytes / (1024 * 1024)
         return f"{size_mb:.1f} MB"
     
     def _save_build_logs(self, build_logs, log_file: Path):
-        """Сохраняет логи сборки в файл"""
+        # Write build logs to file for debugging
         with open(log_file, 'w', encoding='utf-8') as f:
             for chunk in build_logs:
                 if 'stream' in chunk:
@@ -76,42 +77,43 @@ class DockerBuilder:
                     f.write(f"ERROR: {chunk['error']}\n")
     
     def _save_error_log(self, error, log_file: Path):
-        """Сохраняет ошибку в лог-файл"""
+        # Save error details to log file
         with open(log_file, 'w', encoding='utf-8') as f:
             f.write(f"Build Error: {error}\n")
             for line in getattr(error, 'build_log', []):
                 f.write(str(line) + '\n')
     
     def test_image(self, image_name: str) -> bool:
-        """Тестирует собранный образ запуском контейнера"""
+        # Test the built image by running a container
         try:
-            print(f"🧪 Тестируем образ: {image_name}")
+            print(f"Testing image: {image_name}")
             
-            # Запускаем контейнер в фоновом режиме
+            # Run container in detached mode
             container = self.client.containers.run(
                 image_name,
                 detach=True,
-                ports={},  # Можно указать порты если нужно
-                environment={},  # Можно добавить переменные окружения
+                ports={},  # Port mappings can be added here
+                environment={},  # Environment variables can be added here
                 command="echo 'Container started successfully'"
             )
             
-            # Ждем завершения и проверяем логи
+            # Wait for container to complete and check logs
             container.wait(timeout=30)
             logs = container.logs().decode('utf-8')
-            print(f"📄 Логи контейнера: {logs.strip()}")
+            print(f"Container logs: {logs.strip()}")
             
-            # Удаляем контейнер
+            # Remove the test container
             container.remove()
             
-            print("✅ Тестирование пройдено успешно")
+            print("Image test completed successfully")
             return True
             
         except Exception as e:
-            print(f"❌ Ошибка тестирования: {e}")
+            print(f"Image test failed: {e}")
             return False
     
     def list_images(self) -> list:
+        # List all images with amazing-automata prefix
         if not self.client:
             return []
         

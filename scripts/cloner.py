@@ -8,36 +8,36 @@ class RepositoryManager:
         self.base_dir.mkdir(exist_ok=True)
     
     def clone_repository(self, repo_url: str, folder_name: str = None) -> Path:
-        """Клонирует репозиторий в указанную папку"""
+        # Clone repository to specified folder
         
         if folder_name is None:
-            # Извлекаем имя репозитория из URL
+            # Extract repository name from URL
             folder_name = repo_url.split('/')[-1].replace('.git', '')
         
         clone_path = self.base_dir / folder_name
         
-        # Удаляем папку, если она уже существует
+        # Remove folder if it already exists
         if clone_path.exists():
             shutil.rmtree(clone_path)
-            print(f"🗑️  Удалена существующая папка: {folder_name}")
+            print(f"Removed existing folder: {folder_name}")
         
         try:
-            print(f"⬇️  Клонируем {repo_url} в {clone_path}...")
+            print(f"Cloning {repo_url} to {clone_path}...")
             
-            # Клонируем репозиторий
+            # Clone the repository
             repo = git.Repo.clone_from(repo_url, clone_path)
             
-            print(f"✅ Успешно клонирован в: {clone_path}")
-            print(f"📊 Последний коммит: {repo.head.commit.message[:50]}...")
+            print(f"Successfully cloned to: {clone_path}")
+            print(f"Latest commit: {repo.head.commit.message[:50]}...")
             
             return clone_path
             
         except git.exc.GitCommandError as e:
-            print(f"❌ Ошибка при клонировании: {e}")
+            print(f"Cloning error: {e}")
             return None
     
     def clone_github_repo(self, owner: str, repo_name: str, use_https: bool = True) -> Path:
-        """Клонирует репозиторий с GitHub по имени владельца и репозитория"""
+        # Clone repository from GitHub using owner and repository name
         
         if use_https:
             repo_url = f"https://github.com/{owner}/{repo_name}.git"
@@ -47,7 +47,7 @@ class RepositoryManager:
         return self.clone_repository(repo_url, repo_name)
     
     def get_repo_info(self, repo_path: Path) -> dict:
-        """Получает информацию о клонированном репозитории"""
+        # Get information about cloned repository
         try:
             repo = git.Repo(repo_path)
             
@@ -60,13 +60,33 @@ class RepositoryManager:
                 'size_mb': self.get_folder_size(repo_path)
             }
         except Exception as e:
-            print(f"Ошибка при получении информации: {e}")
+            print(f"Error getting repository info: {e}")
             return {}
     
     def get_folder_size(self, path: Path) -> float:
-        """Вычисляет размер папки в МБ"""
+        # Calculate folder size in megabytes
         total_size = 0
         for file_path in path.rglob('*'):
             if file_path.is_file():
                 total_size += file_path.stat().st_size
         return round(total_size / (1024 * 1024), 2)
+    
+    def list_cloned_repos(self) -> list:
+        # List all cloned repositories
+        repos = []
+        for item in self.base_dir.iterdir():
+            if item.is_dir():
+                repo_info = self.get_repo_info(item)
+                repos.append(repo_info)
+        return repos
+    
+    def remove_repository(self, repo_name: str) -> bool:
+        # Remove cloned repository
+        repo_path = self.base_dir / repo_name
+        if repo_path.exists():
+            shutil.rmtree(repo_path)
+            print(f"Repository removed: {repo_name}")
+            return True
+        else:
+            print(f"Repository not found: {repo_name}")
+            return False
