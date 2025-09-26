@@ -1,5 +1,4 @@
-import git
-import os
+import git # type: ignore
 import shutil
 from pathlib import Path
 

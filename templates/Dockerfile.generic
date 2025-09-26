@@ -1,0 +1,10 @@
+# templates/Dockerfile.generic
+FROM ubuntu:22.04
+
+WORKDIR /app
+
+# Копируем все файлы проекта
+COPY . .
+
+# Пытаемся определить и запустить приложение
+CMD ["sh", "-c", "echo 'Please customize this Dockerfile for your project' && ls -la"]

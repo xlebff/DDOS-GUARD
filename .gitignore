@@ -1,3 +1,7 @@
 .env
 __pycache__
 venv
+cloned_repos
+logs
+outputs
+build_result.json

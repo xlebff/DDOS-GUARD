@@ -96,22 +96,3 @@ class GitHubScanner:
                     return project_type
         
         return 'unknown'
-    
-    def download_file(self, owner: str, repo: str, file_path: str) -> str:
-        """Скачивает содержимое файла"""
-        url = f"{self.base_url}/repos/{owner}/{repo}/contents/{file_path}"
-        
-        try:
-            response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
-            
-            file_data = response.json()
-            if 'content' in file_data:
-                import base64
-                content = base64.b64decode(file_data['content']).decode('utf-8')
-                return content
-            else:
-                return f"Не удалось получить содержимое файла: {file_path}"
-                
-        except requests.exceptions.RequestException as e:
-            return f"Ошибка при загрузке файла: {e}"

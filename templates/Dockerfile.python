@@ -1,0 +1,24 @@
+# Этап 1: Сборка
+FROM python:3.11 as builder
+
+WORKDIR /app
+COPY requirements.txt .
+# Устанавливаем зависимости в отдельную директорию
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Этап 2: Финальный образ
+FROM python:3.11-slim
+
+WORKDIR /app
+# Копируем установленные зависимости из этапа builder
+COPY --from=builder /root/.local /root/.local
+# Копируем исходный код
+COPY . .
+
+# Указываем PATH, чтобы система находила наши зависимости
+ENV PATH=/root/.local/bin:$PATH
+
+EXPOSE 8000
+
+# Команда для запуска приложения
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]

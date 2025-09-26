@@ -1,15 +1,17 @@
 import sys
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 from scaner import GitHubScanner
-from clone_manager import RepositoryManager
+from cloner import RepositoryManager
+from build_orchestrator import BuildOrchestrator
 
 if __name__ == "__main__":
     load_dotenv()
     TOKEN = os.getenv('TOKEN')
 
-    owner = sys.argv[1]
-    repo = sys.argv[2]
+    if len(sys.argv) == 3:
+        owner = sys.argv[1]
+        repo = sys.argv[2]
     
     scanner = GitHubScanner(TOKEN)
     
@@ -25,3 +27,6 @@ if __name__ == "__main__":
         print("\n📋 Информация о репозитории:")
         for key, value in info.items():
             print(f"  {key}: {value}")
+
+    orchestrator = BuildOrchestrator()
+    result = orchestrator.build_project(repo, project_type)
