@@ -19,6 +19,11 @@ class BuildOrchestrator:
         print(f"Starting project build: {repo_name}")
         print(f"Project type: {project_type}")
         
+        # Debug: list repository contents
+        print("Repository contents:")
+        for item in repo_path.iterdir():
+            print(f"  - {item.name}")
+        
         # Check if Dockerfile already exists
         target_dockerfile = repo_path / "Dockerfile"
         
@@ -34,8 +39,15 @@ class BuildOrchestrator:
                 import shutil
                 shutil.copy2(dockerfile_path, target_dockerfile)
                 print(f"Dockerfile copied to: {target_dockerfile}")
+                
+                # Print generated Dockerfile content for debugging
+                print("Generated Dockerfile content:")
+                with open(target_dockerfile, 'r') as f:
+                    print(f.read())
             else:
                 return {'error': f'Failed to generate Dockerfile for {repo_name}'}
+    
+    # ... rest of the method
         
         # Step 2: Build Docker image
         print("Building Docker image...")

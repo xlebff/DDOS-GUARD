@@ -18,12 +18,39 @@ class DockerfileGenerator:
             'build_commands': []
         }
         
-        # Find entry point file
-        entry_points = ['main.py', 'app.py', 'index.js', 'server.js', 'src/main.java', 'main.go']
+        # Find entry point file with better detection
+        entry_points = [
+            'main.py', 'app.py', 'run.py', 'manage.py', 
+            'wsgi.py', 'application.py', 'index.py'
+        ]
+        
+        # Check for common entry points
         for ep in entry_points:
             if (repo_path / ep).exists():
                 analysis['entry_point'] = ep
                 break
+        
+        # If no common entry point found, look for any .py file with main function
+        if not analysis['entry_point']:
+            for py_file in repo_path.glob('*.py'):
+                try:
+                    with open(py_file, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                        if 'if __name__ == "__main__"' in content or 'def main()' in content:
+                            analysis['entry_point'] = py_file.name
+                            break
+                except:
+                    continue
+        
+        # Fallback to first .py file if still not found
+        if not analysis['entry_point']:
+            py_files = list(repo_path.glob('*.py'))
+            if py_files:
+                analysis['entry_point'] = py_files[0].name
+        
+        # Ultimate fallback
+        if not analysis['entry_point']:
+            analysis['entry_point'] = 'app.py'
         
         # Find configuration files
         config_patterns = ['package.json', 'requirements.txt', 'pom.xml', 'build.gradle', 'go.mod', 'Cargo.toml']
@@ -37,6 +64,7 @@ class DockerfileGenerator:
         elif (repo_path / 'pom.xml').exists():
             analysis['build_commands'] = ['mvn clean package']
         
+        print(f"Detected entry point: {analysis['entry_point']}")
         return analysis
     
     def generate_dockerfile(self, repo_path: Path, project_type: str) -> Path:

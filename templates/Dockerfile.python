@@ -1,14 +1,17 @@
 FROM python:3.11-slim
 
 WORKDIR /app
-
-# Copy project files
 COPY . .
 
 # Install dependencies if requirements.txt exists
 RUN if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi
 
+# Debug: list files to verify entry point exists
+RUN ls -la
+
 EXPOSE 8000
 
-# Run the application
-CMD ["python", "{{ENTRY_POINT}}"]
+# Use the detected entry point
+ENTRYPOINT ["python", "{{ENTRY_POINT}}"]
+
+CMD ["bash"]
