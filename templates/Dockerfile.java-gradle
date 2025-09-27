@@ -1,0 +1,56 @@
+FROM gradle:7.4.2-jdk17 AS builder
+
+WORKDIR /app
+
+# Копируем все файлы проекта
+COPY . .
+
+# Подготавливаем сборку в зависимости от структуры проекта
+RUN set -e && \
+    echo "Analyzing project structure..." && \
+    \
+    if [ -f gradlew ]; then \
+        chmod +x gradlew && \
+        echo "Found Gradle wrapper"; \
+    fi && \
+    \
+    if [ ! -f build.gradle ] && [ ! -f build.gradle.kts ]; then \
+        echo "Error: No build.gradle or build.gradle.kts found" && \
+        echo "Available files:" && \
+        ls -la && \
+        exit 1; \
+    fi && \
+    \
+    if [ -f gradlew ]; then \
+        echo "Building with Gradle wrapper..." && \
+        ./gradlew build -x test --no-daemon; \
+    else \
+        echo "Building with system Gradle..." && \
+        gradle build -x test --no-daemon; \
+    fi && \
+    \
+    if [ ! -d build/libs ] || [ -z "$(ls -A build/libs/*.jar 2>/dev/null)" ]; then \
+        echo "Error: No JAR file produced after build" && \
+        echo "Build directory contents:" && \
+        ls -la build/ || echo "No build directory" && \
+        ls -la build/libs/ 2>/dev/null || echo "No libs directory" && \
+        exit 1; \
+    fi
+
+# Финальный образ
+FROM openjdk:17-jre-slim
+
+WORKDIR /app
+
+# Копируем JAR из стадии сборки
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# Создаем непривилегированного пользователя
+RUN groupadd -r javaapp && useradd -r -g javaapp javaapp && \
+    chown -R javaapp:javaapp /app
+
+USER javaapp
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

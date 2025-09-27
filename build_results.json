@@ -8,22 +8,22 @@
   },
   "PYTHON_TEST": {
     "project_type": "python",
-    "timestamp": "2025-09-27T06:54:39.818531",
+    "timestamp": "2025-09-27T07:53:18.786951",
     "result": {
       "success": true,
-      "image_id": "sha256:6e8c29b02b7956307355eec64b83db78ac22bf7da54e9663226d7b4b5258b2dc",
+      "image_id": "sha256:3ce23a219cacfa9fd78a49fd5734df22f7ffdbfb6ae24a4060a42b691ee5094f",
       "image_name": "amazing-automata/python_test:latest",
       "size": "43.6 MB",
-      "log_file": "logs\\build_PYTHON_TEST_20250927_065431.log",
+      "log_file": "logs\\build_PYTHON_TEST_20250927_075310.log",
       "test_passed": true
     }
   },
   "gin": {
     "project_type": "go",
-    "timestamp": "2025-09-27T01:17:51.839610",
+    "timestamp": "2025-09-27T09:18:56.908551",
     "result": {
-      "error": "Build error: The command '/bin/sh -c go mod download' returned a non-zero code: 1",
-      "log_file": "logs\\build_gin_20250927_011703.log"
+      "error": "Build error: The command '/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping' returned a non-zero code: 1",
+      "log_file": "logs\\build_gin_20250927_091855.log"
     }
   },
   "awesome-python": {
@@ -36,6 +36,30 @@
       "size": "62.5 MB",
       "log_file": "logs\\build_awesome-python_20250927_015121.log",
       "test_passed": true
+    }
+  },
+  "Go": {
+    "project_type": "go",
+    "timestamp": "2025-09-27T08:42:26.571229",
+    "result": {
+      "error": "Build error: The command '/bin/sh -c go build -o main .' returned a non-zero code: 1",
+      "log_file": "logs\\build_Go_20250927_084205.log"
+    }
+  },
+  "go-micro": {
+    "project_type": "go",
+    "timestamp": "2025-09-27T08:52:26.996974",
+    "result": {
+      "error": "Build error: The command '/bin/sh -c CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping' returned a non-zero code: 1",
+      "log_file": "logs\\build_go-micro_20250927_085117.log"
+    }
+  },
+  "PokeGOAPI-Java": {
+    "project_type": "java-gradle",
+    "timestamp": "2025-09-27T09:18:30.498030",
+    "result": {
+      "error": "Build error: The command '/bin/sh -c set -e &&     echo \"Analyzing project structure...\" &&         if [ -f gradlew ]; then         chmod +x gradlew &&         echo \"Found Gradle wrapper\";     fi &&         if [ ! -f build.gradle ] && [ ! -f build.gradle.kts ]; then         echo \"Error: No build.gradle or build.gradle.kts found\" &&         echo \"Available files:\" &&         ls -la &&         exit 1;     fi &&         if [ -f gradlew ]; then         echo \"Building with Gradle wrapper...\" &&         ./gradlew build -x test --no-daemon;     else         echo \"Building with system Gradle...\" &&         gradle build -x test --no-daemon;     fi &&         if [ ! -d build/libs ] || [ -z \"$(ls -A build/libs/*.jar 2>/dev/null)\" ]; then         echo \"Error: No JAR file produced after build\" &&         echo \"Build directory contents:\" &&         ls -la build/ || echo \"No build directory\" &&         ls -la build/libs/ 2>/dev/null || echo \"No libs directory\" &&         exit 1;     fi' returned a non-zero code: 127",
+      "log_file": "logs\\build_PokeGOAPI-Java_20250927_091822.log"
     }
   }
 }

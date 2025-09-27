@@ -1,0 +1,31 @@
+FROM maven:3.8.6-openjdk-17 AS build
+
+WORKDIR /app
+
+# Копируем pom.xml для кэширования зависимостей
+COPY pom.xml .
+
+# Скачиваем зависимости
+RUN mvn dependency:go-offline -B
+
+# Копируем исходный код
+COPY src ./src
+
+# Собираем приложение
+RUN mvn clean package -DskipTests
+
+# Финальный образ
+FROM openjdk:17-jre-slim
+
+WORKDIR /app
+
+# Копируем собранный JAR из стадии сборки
+COPY --from=build /app/target/*.jar app.jar
+
+# Ищем главный класс в манифесте
+RUN java -cp app.jar org.springframework.boot.loader.JarLauncher || echo "Not a Spring Boot app"
+
+EXPOSE 8080
+
+# Запуск приложения
+ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -1,0 +1,17 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt uvicorn
+
+# Copy application code
+COPY . .
+
+EXPOSE 8000
+
+# Auto-detect FastAPI application file
+CMD ["sh", "-c", "for file in main.py app.py server.py api.py; do if [ -f \"$file\" ]; then module_name=\"${file%.py}\"; echo \"Starting FastAPI from $file as $module_name:app\"; uvicorn \"$module_name:app\" --host 0.0.0.0 --port 8000; exit 0; fi; done; echo 'Error: No FastAPI application file found'; exit 1"]

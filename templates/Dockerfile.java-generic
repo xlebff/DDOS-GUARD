@@ -1,0 +1,20 @@
+FROM openjdk:17-oracle
+
+WORKDIR /app
+
+# Копируем все файлы проекта
+COPY . .
+
+# Компилируем Java файлы
+RUN if [ -f build.gradle ]; then \
+        gradle build; \
+    elif [ -f pom.xml ]; then \
+        mvn package; \
+    else \
+        javac -d bin src/*.java; \
+    fi
+
+EXPOSE 8080
+
+# Определяем точку входа динамически
+CMD ["java", "-cp", "bin", "Main"]

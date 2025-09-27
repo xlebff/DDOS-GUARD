@@ -1,31 +1,18 @@
-FROM golang:1.21-alpine as builder
+FROM golang:1.21-alpine
 
 WORKDIR /app
 
-# Копируем go.mod и go.sum
-COPY go.mod go.sum ./
-
-# Скачиваем зависимости
-RUN go mod download
-
-# Копируем исходный код
+# Копируем все файлы проекта
 COPY . .
 
+# Скачиваем зависимости (если есть go.mod)
+RUN if [ -f go.mod ]; then \
+    go mod download; \
+    fi
+
 # Собираем приложение
-RUN go build -o main {{BUILD_FLAGS}}
+RUN go build -v -o main .
 
-# Финальный образ
-FROM alpine:latest
-
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /root/
-
-# Копируем бинарник из стадии сборки
-COPY --from=builder /app/main .
-
-# Определяем точку входа
-CMD ["./main"]
-
-# Экспонируем порт (если нужно)
 EXPOSE 8080
+
+CMD ["./main"]

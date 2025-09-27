@@ -39,15 +39,8 @@ class BuildOrchestrator:
                 import shutil
                 shutil.copy2(dockerfile_path, target_dockerfile)
                 print(f"Dockerfile copied to: {target_dockerfile}")
-                
-                # Print generated Dockerfile content for debugging
-                print("Generated Dockerfile content:")
-                with open(target_dockerfile, 'r') as f:
-                    print(f.read())
             else:
                 return {'error': f'Failed to generate Dockerfile for {repo_name}'}
-    
-    # ... rest of the method
         
         # Step 2: Build Docker image
         print("Building Docker image...")

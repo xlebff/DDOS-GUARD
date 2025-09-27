@@ -93,7 +93,12 @@ class GitHubScanner:
                     if any(f.endswith('.csproj') for f in file_names):
                         return project_type
                 elif indicator in file_names:
-                    return project_type
+                    if project_type == 'java-gradle' and 'build.gradle' in file_names:
+                        return 'java-gradle'
+                    elif project_type == 'java-maven' and 'pom.xml' in file_names:
+                        return 'java-maven'
+                    else:
+                        return project_type
         
         # Дополнительная проверка для Python проектов по .py файлам
         if any(f.endswith('.py') for f in file_names):

@@ -15,7 +15,11 @@ class DockerfileGenerator:
             'entry_point': None,
             'config_files': [],
             'dependencies_files': [],
-            'build_commands': []
+            'build_commands': [],
+            'python_framework': 'generic',
+            'is_web_app': False,
+            'port': 8080,
+            'java_type': None
         }
         
         # Find entry point file with better detection
@@ -66,7 +70,7 @@ class DockerfileGenerator:
         
         print(f"Detected entry point: {analysis['entry_point']}")
         return analysis
-    
+
     def generate_dockerfile(self, repo_path: Path, project_type: str) -> Path:
         # Generate Dockerfile based on template and project analysis
         
